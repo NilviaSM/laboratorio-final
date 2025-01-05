@@ -23,35 +23,32 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-
       - name: Install SonarCloud Scanner
         run: |
           curl -sSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip -o sonar-scanner.zip
           unzip sonar-scanner.zip -d $HOME
-          export PATH=$HOME/sonar-scanner-$VERSION/bin:$PATH
+          echo "$HOME/sonar-scanner-4.6.2.2472-linux/bin" >> $GITHUB_PATH
 
-          - name: Run SonarCloud Scan
-          env:
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          run: |
-            sonar-scanner \
-              -Dsonar.projectKey=NilviaSM_laboratorio-final \
-              -Dsonar.organization=NilviaSM \
-              -Dsonar.sources=. \
-              -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-        
+      - name: Run SonarCloud Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=NilviaSM_laboratorio-final \
+            -Dsonar.organization=NilviaSM \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
   sca:
     runs-on: ubuntu-latest
     steps:
       # Etapa 3: Análisis de dependencias con OWASP Dependency-Check
       - name: Run OWASP Dependency Check
-        uses: dependency-check/Dependency-Check_Action@v2
+        uses: dependency-check/Dependency-Check_Action@v1
         with:
           output_directory: ./dependency-check-report
           fail_build_on_any_severity: true
-
 
   docker_build:
     runs-on: ubuntu-latest
