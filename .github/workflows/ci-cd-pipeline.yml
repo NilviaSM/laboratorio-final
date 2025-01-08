@@ -45,7 +45,7 @@ jobs:
     steps:
       # Etapa 3: Análisis de dependencias con OWASP Dependency-Check
       - name: Run OWASP Dependency Check
-        uses: dependency-check/Dependency-Check_Action@v1
+        uses: jeremylong/gh-dependency-check-action@v4.4.1
         with:
           output_directory: ./dependency-check-report
           fail_build_on_any_severity: true
