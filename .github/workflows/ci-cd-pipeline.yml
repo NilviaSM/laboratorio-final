@@ -1,0 +1,87 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      # Etapa 1: Checkout del código
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Java JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install SonarCloud Scanner
+        run: |
+          curl -sSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip -o sonar-scanner.zip
+          unzip sonar-scanner.zip -d $HOME
+          echo "$HOME/sonar-scanner-4.8.0.2856-linux/bin" >> $GITHUB_PATH
+
+      - name: Run SonarCloud Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=NilviaSM_laboratorio-final \
+            -Dsonar.organization=NilviaSM \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.branch.name=main
+
+  sca:
+    runs-on: ubuntu-latest
+    steps:
+      # Etapa 3: Análisis de dependencias con OWASP Dependency-Check
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run OWASP Dependency Check
+        run: |
+          curl -sSL https://github.com/jeremylong/DependencyCheck/releases/download/v7.5.0/dependency-check-7.5.0-release.zip -o dependency-check.zip
+          unzip dependency-check.zip -d $HOME/dependency-check
+          $HOME/dependency-check/bin/dependency-check.sh \
+            --project "laboratorio-final" \
+            --scan . \
+            --out ./dependency-check-report \
+            --format "ALL"
+
+  docker_build:
+    runs-on: ubuntu-latest
+    steps:
+      # Etapa 4: Construcción de la imagen Docker
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build Docker Image
+        run: docker build -t laboratorio-final:${{ github.sha }} .
+
+      - name: Push Docker Image
+        run: docker push laboratorio-final:${{ github.sha }}
+
+  image_security:
+    runs-on: ubuntu-latest
+    steps:
+      # Etapa 5: Análisis de seguridad de la imagen Docker con Trivy
+      - name: Download Trivy
+        run: |
+          curl -sSL https://github.com/aquasecurity/trivy/releases/download/v0.34.0/trivy_0.34.0_Linux-64bit.tar.gz -o trivy.tar.gz
+          tar -zxvf trivy.tar.gz -C /usr/local/bin/
+
+      - name: Run Trivy Scan
+        run: |
+          trivy image laboratorio-final:${{ github.sha }}
