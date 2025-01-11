@@ -9,7 +9,6 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      # Etapa 1: Checkout del código
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -46,9 +45,14 @@ jobs:
   sca:
     runs-on: ubuntu-latest
     steps:
-      # Etapa 3: Análisis de dependencias con OWASP Dependency-Check
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Install Node.js dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm install
+          fi
 
       - name: Run OWASP Dependency Check
         run: |
@@ -58,12 +62,12 @@ jobs:
             --project "laboratorio-final" \
             --scan . \
             --out ./dependency-check-report \
-            --format "ALL"
+            --format "ALL" \
+            --disableAssembly
 
   docker_build:
     runs-on: ubuntu-latest
     steps:
-      # Etapa 4: Construcción de la imagen Docker
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -82,7 +86,6 @@ jobs:
   image_security:
     runs-on: ubuntu-latest
     steps:
-      # Etapa 5: Análisis de seguridad de la imagen Docker con Trivy
       - name: Download Trivy
         run: |
           curl -sSL https://github.com/aquasecurity/trivy/releases/download/v0.34.0/trivy_0.34.0_Linux-64bit.tar.gz -o trivy.tar.gz
