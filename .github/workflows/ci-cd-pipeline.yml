@@ -52,7 +52,7 @@ jobs:
 
       - name: Run OWASP Dependency Check
         run: |
-          curl -sSL https://github.com/jeremylong/DependencyCheck/releases/download/v7.5.0/dependency-check-7.5.0-release.zip -o dependency-check.zip
+          curl -sSL https://github.com/jeremylong/DependencyCheck/releases/download/v8.0.0/dependency-check-8.0.0-release.zip -o dependency-check.zip
           unzip dependency-check.zip -d $HOME/dependency-check
           $HOME/dependency-check/bin/dependency-check.sh \
             --project "laboratorio-final" \
