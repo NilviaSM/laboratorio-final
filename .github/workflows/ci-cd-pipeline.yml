@@ -14,6 +14,7 @@ jobs:
 
   sast:
     runs-on: ubuntu-latest
+    needs: setup # Se ejecutará solo SI "setup" tiene éxito
     steps:
       - name: Set up Java JDK 17
         uses: actions/setup-java@v2
@@ -44,6 +45,7 @@ jobs:
 
   sca:
     runs-on: ubuntu-latest
+    needs: sast # Se ejecutará solo SI "sast" tiene éxito
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -67,6 +69,7 @@ jobs:
 
   docker_build:
     runs-on: ubuntu-latest
+    needs: sca # Se ejecutará solo SI "sca" tiene éxito
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -89,6 +92,7 @@ jobs:
 
   image_security:
     runs-on: ubuntu-latest
+    needs: docker_build # Se ejecutará solo SI "docker_build" tiene éxito
     steps:
       - name: Download Trivy
         run: |
