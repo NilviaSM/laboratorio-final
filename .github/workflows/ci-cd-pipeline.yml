@@ -16,7 +16,6 @@ jobs:
   sast:
     runs-on: ubuntu-latest
     steps:
-      # Etapa 2: Configuración de SonarCloud para análisis SAST
       - name: Set up Java JDK 17
         uses: actions/setup-java@v2
         with:
@@ -25,10 +24,9 @@ jobs:
 
       - name: Install SonarCloud Scanner
         run: |
-            curl -sSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip -o sonar-scanner.zip
-            unzip sonar-scanner.zip -d $HOME
-            echo "$HOME/sonar-scanner-4.8.0.2856-linux/bin" >> $GITHUB_PATH
-        
+          curl -sSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip -o sonar-scanner.zip
+          unzip sonar-scanner.zip -d $HOME
+          echo "$HOME/sonar-scanner-4.8.0.2856-linux/bin" >> $GITHUB_PATH
 
       - name: Run SonarCloud Scan
         env:
@@ -39,7 +37,8 @@ jobs:
             -Dsonar.organization=NilviaSM \
             -Dsonar.sources=. \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.branch.name=devsecops-implementation
 
   sca:
     runs-on: ubuntu-latest
