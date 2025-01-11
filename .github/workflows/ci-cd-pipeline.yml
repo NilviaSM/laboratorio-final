@@ -78,10 +78,14 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker Image
-        run: docker build -t laboratorio-final:${{ github.sha }} .
+        run: |
+          docker build -t nilvia/laboratorio-final:${{ github.sha }} .
+          docker tag nilvia/laboratorio-final:${{ github.sha }} nilvia/laboratorio-final:latest
 
       - name: Push Docker Image
-        run: docker push laboratorio-final:${{ github.sha }}
+        run: |
+          docker push nilvia/laboratorio-final:${{ github.sha }}
+          docker push nilvia/laboratorio-final:latest
 
   image_security:
     runs-on: ubuntu-latest
@@ -91,6 +95,8 @@ jobs:
           curl -sSL https://github.com/aquasecurity/trivy/releases/download/v0.34.0/trivy_0.34.0_Linux-64bit.tar.gz -o trivy.tar.gz
           tar -zxvf trivy.tar.gz -C /usr/local/bin/
 
+      - name: Verify Trivy Installation
+        run: trivy --version
+
       - name: Run Trivy Scan
-        run: |
-          trivy image laboratorio-final:${{ github.sha }}
+        run: trivy image nilvia/laboratorio-final:${{ github.sha }}
