@@ -99,9 +99,4 @@ jobs:
         run: trivy --version
 
       - name: Run Trivy Scan
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: |
-          docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
-          trivy image nilvia/laboratorio-final:${{ github.sha }}
+        run: trivy image nilvia/laboratorio-final:latest
