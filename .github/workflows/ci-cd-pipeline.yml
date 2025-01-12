@@ -14,7 +14,6 @@ jobs:
 
   sast:
     runs-on: ubuntu-latest
-    needs: setup # Se ejecutará solo SI "setup" tiene éxito
     steps:
       - name: Set up Java JDK 17
         uses: actions/setup-java@v2
@@ -45,7 +44,6 @@ jobs:
 
   sca:
     runs-on: ubuntu-latest
-    needs: sast # Se ejecutará solo SI "sast" tiene éxito
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -67,9 +65,26 @@ jobs:
             --format "ALL" \
             --disableAssembly
 
+  enhanced_sca:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        env:
+          JAVA_HOME: /opt/jdk
+        id: Depcheck
+        with:
+          project: '${{ github.event.repository.name }}'
+          path: '.'
+          format: 'HTML'
+          args: >
+            --out ./reports
+            --failOnCVSS 5
+
   docker_build:
     runs-on: ubuntu-latest
-    needs: sca # Se ejecutará solo SI "sca" tiene éxito
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -92,7 +107,6 @@ jobs:
 
   image_security:
     runs-on: ubuntu-latest
-    needs: docker_build # Se ejecutará solo SI "docker_build" tiene éxito
     steps:
       - name: Download Trivy
         run: |
