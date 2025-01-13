@@ -66,11 +66,14 @@ jobs:
             --disableAssembly \
             --failOnCVSS 5
 
+      - name: List Dependency Check Reports
+        run: ls -R ./dependency-check-report/
+
       - name: Upload Dependency Check Report
         uses: actions/upload-artifact@v3
         with:
           name: dependency-check-report
-          path: ./dependency-check-report/dependency-check-report.html
+          path: ./dependency-check-report/
 
   enhanced_sca:
     runs-on: ubuntu-24.04
@@ -78,6 +81,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
         env:
@@ -91,11 +95,14 @@ jobs:
             --out ./reports
             --failOnCVSS 5
 
+      - name: List Enhanced Dependency Check Reports
+        run: ls -R ./reports/
+
       - name: Upload Enhanced Dependency Check Report
         uses: actions/upload-artifact@v3
         with:
           name: enhanced-sca-report
-          path: ./reports/dependency-check-report.html
+          path: ./reports/
 
   docker_build:
     runs-on: ubuntu-latest
@@ -134,3 +141,4 @@ jobs:
 
       - name: Run Trivy Scan
         run: trivy image nilvia/laboratorio-final:latest
+
