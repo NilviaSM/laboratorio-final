@@ -122,3 +122,4 @@ jobs:
 
       - name: Run Trivy Scan
         run: trivy image nilvia/laboratorio-final:latest
+
